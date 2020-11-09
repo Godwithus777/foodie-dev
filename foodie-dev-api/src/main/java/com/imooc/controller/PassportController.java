@@ -3,8 +3,10 @@ package com.imooc.controller;
 import com.imooc.pojo.Users;
 import com.imooc.pojo.bo.UserBo;
 import com.imooc.service.UserService;
-import com.imooc.util.IMOOCJSONResult;
-import com.imooc.util.MD5Utils;
+import com.imooc.utils.CookieUtils;
+import com.imooc.utils.IMOOCJSONResult;
+import com.imooc.utils.JsonUtils;
+import com.imooc.utils.MD5Utils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -74,6 +76,12 @@ public class PassportController {
         // 4. 实现注册
         Users userResult = userService.createUser(userBo);
 
+         userResult = setNullProperty(userResult);
+
+        CookieUtils.setCookie(request,response,"user",
+                JsonUtils.objectToJson(userResult),true);
+        // TODO 生成用户token，存入redis会话
+        // TODO 同步购物车数据
 
         return IMOOCJSONResult.ok();
     }
@@ -100,10 +108,41 @@ public class PassportController {
             return IMOOCJSONResult.errorMsg("用户名密码不正确");
         }
 
+        userResult = setNullProperty(userResult);
+
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(userResult), true);
+
+        // TODO 生成用户token，存入redis会话
+        // TODO 同步购物车数据
 
         return IMOOCJSONResult.ok(userResult);
 
 
+    }
+
+    private Users setNullProperty(Users userResult) {
+        userResult.setPassword(null);
+        userResult.setMobile(null);
+        userResult.setEmail(null);
+        userResult.setCreatedTime(null);
+        userResult.setUpdatedTime(null);
+        userResult.setBirthday(null);
+        return userResult;
+    }
+
+    @ApiOperation(value = "用户退出登录", notes = "用户退出登录！", httpMethod = "POST")
+    @PostMapping("/logout")
+    public IMOOCJSONResult logout(@RequestParam String userId,
+                                  HttpServletRequest request,
+                                  HttpServletResponse response) {
+
+        // 清楚用户的相关信息的cookie
+        CookieUtils.deleteCookie(request,response,"user");
+
+        // TODO 用户退出登录，需要清空购物车
+        // TODO 分布式会话中需要清除用户数据
+
+        return IMOOCJSONResult.ok();
     }
 
 }
