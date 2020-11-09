@@ -4,6 +4,7 @@ import com.imooc.pojo.Users;
 import com.imooc.pojo.bo.UserBo;
 import com.imooc.service.UserService;
 import com.imooc.util.IMOOCJSONResult;
+import com.imooc.util.MD5Utils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +23,7 @@ public class PassportController {
     @Autowired
     private UserService userService;
 
-    @ApiOperation(value = "用户名是否存在",notes = "用户名是否存在！",httpMethod = "GET")
+    @ApiOperation(value = "用户名是否存在", notes = "用户名是否存在！", httpMethod = "GET")
     @GetMapping("/usernameIsExist")
     public IMOOCJSONResult usernameIsExist(@RequestParam String username) {
 
@@ -76,4 +77,33 @@ public class PassportController {
 
         return IMOOCJSONResult.ok();
     }
+
+    @ApiOperation(value = "用户登录", notes = "用户登录", httpMethod = "POST")
+    @PostMapping("/login")
+    public IMOOCJSONResult login(@RequestBody UserBo userBo,
+                                 HttpServletRequest request,
+                                 HttpServletResponse response) throws Exception {
+
+        String username = userBo.getUsername();
+        String password = userBo.getPassword();
+
+        // 0.判断用户名和密码必须不为空
+        if (StringUtils.isBlank(username) ||
+                StringUtils.isBlank(password)) {
+            return IMOOCJSONResult.errorMsg("用户名或密码不能为空");
+        }
+
+        // 1.实现登录
+        Users userResult = userService.queryUserForLogin(username, MD5Utils.getMD5Str(password));
+
+        if (userResult == null) {
+            return IMOOCJSONResult.errorMsg("用户名密码不正确");
+        }
+
+
+        return IMOOCJSONResult.ok(userResult);
+
+
+    }
+
 }
