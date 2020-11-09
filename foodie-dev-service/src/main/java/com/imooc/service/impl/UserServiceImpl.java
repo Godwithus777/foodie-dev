@@ -30,6 +30,13 @@ public class UserServiceImpl implements UserService {
     @Transactional(propagation = Propagation.SUPPORTS)
     @Override
     public boolean queryUsernameIsExist(String username) {
+
+//        try {
+//            Thread.sleep(3500);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
         Example userExample = new Example(Users.class);
         Example.Criteria criteria = userExample.createCriteria();
         // username需和数据库的字段名一致
@@ -79,6 +86,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Users queryUserForLogin(String username, String password) {
 
+//        try {
+//            Thread.sleep(2500);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         Example userExample = new Example(Users.class);
         Example.Criteria userCriteria = userExample.createCriteria();
 
