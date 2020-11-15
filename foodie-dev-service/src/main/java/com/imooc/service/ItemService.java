@@ -53,6 +53,7 @@ public interface ItemService {
     public CommentLevelCountsVO queryCommentCounts(String itemId);
 
     /**
+     * 根据商品id查询商品的评价(分页)
      * @param itemId
      * @param level
      * @param page
