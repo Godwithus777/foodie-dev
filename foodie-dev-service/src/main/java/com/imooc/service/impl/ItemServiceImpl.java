@@ -9,6 +9,7 @@ import com.imooc.pojo.*;
 import com.imooc.pojo.vo.CommentLevelCountsVO;
 import com.imooc.pojo.vo.ItemCommentVO;
 import com.imooc.service.ItemService;
+import com.imooc.utils.DesensitizationUtil;
 import com.imooc.utils.PagedGridResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -115,10 +116,13 @@ public class ItemServiceImpl implements ItemService {
 
         //  mybatis-pagehelper
 
-        // page 第几页 pageSize: 煤业显示条数
+        // page 第几页 pageSize: 每页显示条数
         PageHelper.startPage(page, pageSize);
         List<ItemCommentVO> list = itemsMapperCustom.queryItemComments(map);
-
+        // 信息的脱敏
+        for (ItemCommentVO vo : list) {
+            vo.setNickname(DesensitizationUtil.commonDisplay(vo.getNickname()));
+        }
         return setterPagedGrid(list,page);
 
     }
